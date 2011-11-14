@@ -25,7 +25,7 @@
 #include "shared-tests/common.hh"
 #include "shared-tests/distance-to-sphere.hh"
 
-using roboptim::cminpack::SumOfC1Squares;
+using roboptim::SumOfC1Squares;
 using roboptim::Result;
 using roboptim::GenericSolver;
 using roboptim::Solver;

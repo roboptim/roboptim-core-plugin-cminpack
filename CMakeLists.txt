@@ -39,7 +39,6 @@ SETUP_PROJECT()
 # Declare headers
 SET(${PROJECT_NAME}_HEADERS
   include/roboptim/core/plugin/cminpack.hh
-  include/roboptim/core/plugin/sum-of-c1-squares.hh
   )
 
 ADD_REQUIRED_DEPENDENCY("cminpack >= 1.0")

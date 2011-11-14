@@ -46,7 +46,6 @@ SET(COMMON_HEADERS
 MACRO(ROBOPTIM_CORE_PLUGIN_CMINPACK_TEST NAME)
   ADD_EXECUTABLE(${NAME}
     ${NAME}.cc
-    ${CMAKE_SOURCE_DIR}/src/sum-of-c1-squares.cc
     ${COMMON_HEADERS})
   ADD_TEST(${NAME} ${RUNTIME_OUTPUT_DIRECTORY}/${NAME})
 
@@ -64,7 +63,6 @@ ADD_EXECUTABLE(simple
   simple.cc
   ${COMMON_HEADERS}
   ${CMAKE_SOURCE_DIR}/src/cminpack.cc
-  ${CMAKE_SOURCE_DIR}/src/sum-of-c1-squares.cc
   )
 PKG_CONFIG_USE_DEPENDENCY(simple roboptim-core)
 PKG_CONFIG_USE_DEPENDENCY(simple cminpack)

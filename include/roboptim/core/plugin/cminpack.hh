@@ -23,7 +23,7 @@
 # include <boost/mpl/vector.hpp>
 # include <roboptim/core/solver.hh>
 
-# include "roboptim/core/plugin/sum-of-c1-squares.hh"
+# include "roboptim/core/sum-of-c1-squares.hh"
 
 namespace roboptim {
   namespace cminpack {
