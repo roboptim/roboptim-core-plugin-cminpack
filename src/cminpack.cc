@@ -60,6 +60,8 @@ extern "C" {
 }
 namespace roboptim {
   namespace cminpack {
+    typedef Function::size_type size_type;
+
     SolverWithJacobian::SolverWithJacobian (const problem_t& problem) :
       Solver <SumOfC1Squares, boost::mpl::vector<> >
       (problem),
@@ -83,11 +85,11 @@ namespace roboptim {
 
       // Initialize this class parameters
       parameter_.resize (n_);
-      parameter_.clear ();
+      parameter_.setZero ();
       value_.resize (m_);
-      value_.clear ();
+      value_.setZero ();
       jacobianRow_.resize (n_);
-      jacobianRow_.clear ();
+      jacobianRow_.setZero ();
     }
     SolverWithJacobian::~SolverWithJacobian () throw ()
     {
@@ -177,12 +179,12 @@ namespace roboptim {
     matrix_to_array (Function::value_type* dst, const Function::matrix_t& src,
 		     int iRow)
     {
-      if (src.size2 () == 0)
+      if (src.cols () == 0)
 	return;
-      memcpy (dst, &src(iRow,0), src.size2 () * sizeof (Function::value_type));
+      memcpy (dst, &src(iRow,0), src.cols () * sizeof (Function::value_type));
 
       // NaN != NaN, handle this case.
-      for (std::size_t j = 0; j < src.size2 (); ++j)
+      for (size_type j = 0; j < src.cols (); ++j)
 	if (src(iRow,j) != src(iRow,j))
 	  assert (dst[j] != dst[j]);
 	else
