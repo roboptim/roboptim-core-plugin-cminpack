@@ -1,0 +1,18 @@
+Solver:
+  Problem:
+    Differentiable function
+    Argument's bounds: (-inf, inf), (-inf, inf)
+    Argument's scales: 1, 1
+    
+    Starting point: [2](0,0)
+    Starting value: [1](4.89747)
+    Infinity value (for all functions): inf
+  Parameters:
+    
+A solution has been found: 
+Result: 
+  Size (input, output): 2, 1
+  X: [2](-1.50017,-1.20043)
+  Value: [1](1)
+  Constraints values: [0]()
+  Lambda: [0]()
