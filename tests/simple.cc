@@ -30,8 +30,11 @@ using roboptim::SolverError;
 using roboptim::cminpack::F;
 using roboptim::cminpack::SolverWithJacobian;
 
-int run_test ()
+BOOST_AUTO_TEST_CASE (simple)
 {
+  boost::shared_ptr<boost::test_tools::output_test_stream>
+    output = retrievePattern ("simple");
+
   boost::shared_ptr <F> f (new F());
   SumOfC1Squares soq (f, "");
   SolverWithJacobian::problem_t pb(soq);
@@ -40,23 +43,25 @@ int run_test ()
   // Solve the problem and get result
   SolverWithJacobian::result_t res = solver.minimum ();
   // Display solver information.
-  std::cout << solver << std::endl;
+  (*output) << solver << std::endl;
 
   if ((res.which () != GenericSolver::SOLVER_VALUE) &&
-      (res.which () != GenericSolver::SOLVER_VALUE_WARNINGS)) {
-    std::cout << "A solution should have been found. Failing..."
-	      << std::endl
-	      << boost::get<SolverError> (res).what ()
-	      << std::endl;
-    return 1;
-  }
+      (res.which () != GenericSolver::SOLVER_VALUE_WARNINGS))
+    {
+      (*output) << "A solution should have been found. Failing..."
+		<< std::endl
+		<< boost::get<SolverError> (res).what ()
+		<< std::endl;
+      BOOST_FAIL ("optimization failed");
+    }
+
   // Get the result.
   Result& result = boost::get<Result> (res);
 
   // Display the result.
-  std::cout << "A solution has been found: " << std::endl;
-  std::cout << result << std::endl;
-  return 0;
-}
+  (*output) << "A solution has been found: " << std::endl;
+  (*output) << result << std::endl;
 
-GENERATE_TEST ()
+  std::cout << output->str () << std::endl;
+  BOOST_CHECK (output->match_pattern ());
+}

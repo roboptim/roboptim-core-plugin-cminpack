@@ -17,6 +17,8 @@
 // roboptim-core-plugin-cminpack  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <cstring>
+
 #include <cminpack.h>
 
 #include "roboptim/core/function.hh"
@@ -58,22 +60,27 @@ extern "C" {
     return 0;
   }
 }
-namespace roboptim {
-  namespace cminpack {
+
+namespace roboptim
+{
+  namespace cminpack
+  {
     SolverWithJacobian::SolverWithJacobian (const problem_t& problem) :
       Solver <SumOfC1Squares, boost::mpl::vector<> >
       (problem),
+      n_ (problem.function ().baseFunction ()->inputSize ()),
+      m_ (problem.function ().baseFunction ()->outputSize ()),
+      x_ (new double [n_]),
+      fvec_ (new double [m_]),
+      fjac_ (new double [n_*n_]),
+      ipvt_ (new int [n_]),
+      lwa_ (static_cast<int> (5 * n_ + m_)),
+      wa_ (new double [lwa_]),
+      parameter_ (n_),
+      value_ (m_),
+      jacobianRow_ (n_),
       cost_ (problem.function ().baseFunction ())
     {
-      // Initialize solver parameters
-      n_ = cost_->inputSize();
-      m_ = cost_->outputSize();
-      x_ = new double [n_];
-      fvec_ = new double [m_];
-      fjac_ = new double [n_*n_];
-      ipvt_ = new int [n_];
-      lwa_ = 5*n_+m_;
-      wa_ = new double [lwa_];
       // Initialize memory
       memset (x_, 0, n_ * sizeof(double));
       memset (fvec_, 0, m_ * sizeof(double));
@@ -82,107 +89,107 @@ namespace roboptim {
       memset (wa_, 0, lwa_ * sizeof(double));
 
       // Initialize this class parameters
-      parameter_.resize (n_);
-      parameter_.clear ();
-      value_.resize (m_);
-      value_.clear ();
-      jacobianRow_.resize (n_);
-      jacobianRow_.clear ();
-    }
-    SolverWithJacobian::~SolverWithJacobian () throw ()
-    {
-      delete [] x_;
-      delete [] fvec_;
-      delete [] fjac_;
-      delete [] ipvt_;
-      delete [] wa_;
+      parameter_.setZero ();
+      value_.setZero ();
+      jacobianRow_.setZero ();
     }
 
-    void SolverWithJacobian::solve() throw ()
+    SolverWithJacobian::~SolverWithJacobian () throw ()
     {
-      int ldfjac = n_;
+      delete[] x_;
+      delete[] fvec_;
+      delete[] fjac_;
+      delete[] ipvt_;
+      delete[] wa_;
+    }
+
+    void SolverWithJacobian::solve () throw ()
+    {
+      int ldfjac = static_cast<int> (n_);
       double tol = 1e-6;
       // Set initial guess
       if (problem().startingPoint()) {
 	vector_to_array (x_, *(problem().startingPoint()));
       }
       int info = lmstr1(roboptim_plugin_cminpack_fcn,
-			(void*)this, m_, n_, x_, fvec_, fjac_, ldfjac,
+			(void*)this,
+			static_cast<int> (m_), static_cast<int> (n_),
+			x_, fvec_, fjac_, ldfjac,
 			tol, ipvt_, wa_, lwa_);
       switch (info) {
-	case 0:
-	  result_ = SolverError ("improper input parameters");
-	  break;
-	case 1:
-	case 2:
-	case 3:
-	  {
-	    Result result (n_, 1);
-	    array_to_vector(result.x, x_);
-	    result.value = problem().function()(result.x);
-	    result_ = result;
-	  }
-	  break;
-	case 4:
-	  {
-	    ResultWithWarnings result (n_, 1);
-	    array_to_vector(result.x, x_);
-	    result.value = problem().function()(result.x);
-	    result.warnings.push_back(SolverWarning
-				      ("fvec is orthogonal to the columns of"
-				       " the jacobian to machine precision"));
+      case 0:
+	result_ = SolverError ("improper input parameters");
+	break;
+      case 1:
+      case 2:
+      case 3:
+	{
+	  Result result (n_, 1);
+	  array_to_vector(result.x, x_);
+	  result.value = problem().function()(result.x);
 	  result_ = result;
-	  }
-	  break;
-	case 5:
-	  {
-	    ResultWithWarnings result (n_, 1);
-	    array_to_vector(result.x, x_);
-	    result.value = problem().function()(result.x);
-	    result.warnings.push_back(SolverWarning
-				      ("number of calls to fcn with iflag = 1 "
-				       "has reached 100*(n+1)"));
-	    result_ = result;
-	  }
-	  break;
-	case 6:
-	  {
-	    ResultWithWarnings result (n_, 1);
-	    array_to_vector(result.x, x_);
-	    result.value = problem().function()(result.x);
-	    result.warnings.push_back(SolverWarning
-				      ("tol is too small. no further reduction"
-				       " in the sum of squares is possible"));
-	    result_ = result;
-	  }
-	  break;
-	case 7:
-	  {
-	    ResultWithWarnings result (n_, 1);
-	    array_to_vector(result.x, x_);
-	    result.value = problem().function()(result.x);
-	    result.warnings.push_back(SolverWarning
-				      ("tol is too small. no further"
-				       " improvement in the approximate"
-				       " solution x is possible"));
-	    result_ = result;
-	  }
-	  break;
-	default:
-	  result_ = SolverError ("Return value not documented");
 	}
+	break;
+      case 4:
+	{
+	  ResultWithWarnings result (n_, 1);
+	  array_to_vector(result.x, x_);
+	  result.value = problem().function()(result.x);
+	  result.warnings.push_back(SolverWarning
+				    ("fvec is orthogonal to the columns of"
+				     " the jacobian to machine precision"));
+	  result_ = result;
+	}
+	break;
+      case 5:
+	{
+	  ResultWithWarnings result (n_, 1);
+	  array_to_vector(result.x, x_);
+	  result.value = problem().function()(result.x);
+	  result.warnings.push_back(SolverWarning
+				    ("number of calls to fcn with iflag = 1 "
+				     "has reached 100*(n+1)"));
+	  result_ = result;
+	}
+	break;
+      case 6:
+	{
+	  ResultWithWarnings result (n_, 1);
+	  array_to_vector(result.x, x_);
+	  result.value = problem().function()(result.x);
+	  result.warnings.push_back(SolverWarning
+				    ("tol is too small. no further reduction"
+				     " in the sum of squares is possible"));
+	  result_ = result;
+	}
+	break;
+      case 7:
+	{
+	  ResultWithWarnings result (n_, 1);
+	  array_to_vector(result.x, x_);
+	  result.value = problem().function()(result.x);
+	  result.warnings.push_back(SolverWarning
+				    ("tol is too small. no further"
+				     " improvement in the approximate"
+				     " solution x is possible"));
+	  result_ = result;
+	}
+	break;
+      default:
+	result_ = SolverError ("Return value not documented");
+      }
     }
 
     void
     matrix_to_array (Function::value_type* dst, const Function::matrix_t& src,
 		     int iRow)
     {
-      if (src.size2 () == 0)
+      if (src.cols () == 0)
 	return;
-      memcpy (dst, &src(iRow,0), src.size2 () * sizeof (Function::value_type));
+      memcpy (dst, &src(iRow,0), src.cols () * sizeof (Function::value_type));
 
       // NaN != NaN, handle this case.
-      for (std::size_t j = 0; j < src.size2 (); ++j)
+      for (Eigen::VectorXd::Index j = 0; j < src.cols (); ++j)
 	if (src(iRow,j) != src(iRow,j))
 	  assert (dst[j] != dst[j]);
 	else

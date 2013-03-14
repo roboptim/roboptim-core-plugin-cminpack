@@ -41,6 +41,9 @@ SET(${PROJECT_NAME}_HEADERS
   include/roboptim/core/plugin/cminpack.hh
   )
 
+# Search for dependencies.
+SEARCH_FOR_BOOST()
+
 ADD_REQUIRED_DEPENDENCY("cminpack >= 1.0")
 ADD_REQUIRED_DEPENDENCY("roboptim-core >= 0.5")
 
@@ -51,4 +54,3 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
 
 SETUP_PROJECT_FINALIZE()
-SETUP_PROJECT_CPACK()

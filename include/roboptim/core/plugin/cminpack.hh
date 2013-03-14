@@ -43,7 +43,7 @@ namespace roboptim {
       /// \brief type of result
       typedef parent_t::result_t result_t;
       /// \brief type of gradient
-      typedef DerivableFunction::gradient_t gradient_t;
+      typedef DifferentiableFunction::gradient_t gradient_t;
       /// \brief Size type
       typedef Function::size_type size_type;
 
@@ -52,31 +52,49 @@ namespace roboptim {
       virtual ~SolverWithJacobian () throw ();
       /// \brief Solve the optimization problem
       virtual void solve () throw ();
+
       /// Number of variables
-      int n() const {return n_;}
+      size_type n () const
+      {
+	return n_;
+      }
+
       /// Number of functions
-      int m() const {return m_;}
+      size_type m () const
+      {
+	return m_;
+      }
+
       /// Get parameter
-      Function::argument_t& parameter () {
+      Function::argument_t& parameter ()
+      {
 	return parameter_;
       }
-      const Function::argument_t& parameter () const {return parameter_;}
+
+      const Function::argument_t& parameter () const
+      {
+	return parameter_;
+      }
+
       /// Get value
-      const Function::argument_t& value () const {
+      const Function::argument_t& value () const
+      {
 	(*cost_)(value_, parameter_);
 	return value_;
       }
+
       /// Get Jacobian
-      const gradient_t& jacobianRow (size_t iRow) const {
+      const gradient_t& jacobianRow (size_t iRow) const
+      {
 	(*cost_).gradient(jacobianRow_, parameter_, iRow);
 	return jacobianRow_;
       }
 
     private:
       /// Number of variables
-      size_t n_;
+      size_type n_;
       /// Dimension of the cost function
-      size_t m_;
+      size_type m_;
       /// Array of double to store variable of optimization problem
       double* x_;
       /// Array of double to store value of optimization problem
@@ -97,7 +115,7 @@ namespace roboptim {
       /// Jacobian of the cost function
       mutable gradient_t jacobianRow_;
       /// Reference to cost function
-      boost::shared_ptr <const DerivableFunction> cost_;
+      boost::shared_ptr <const DifferentiableFunction> cost_;
     }; // class Solver
   } // namespace cminpack
 } // namespace roboptim

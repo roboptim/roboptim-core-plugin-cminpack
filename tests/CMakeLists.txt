@@ -36,7 +36,7 @@ SET(COMMON_HEADERS
   )
 
 # ROBOPTIM_CORE_CMINPACK_PLUGIN_TEST(NAME)
-# ------------------------
+# ----------------------------------------
 #
 # Define a test named `NAME'.
 #
@@ -66,6 +66,7 @@ ADD_EXECUTABLE(simple
   )
 PKG_CONFIG_USE_DEPENDENCY(simple roboptim-core)
 PKG_CONFIG_USE_DEPENDENCY(simple cminpack)
+TARGET_LINK_LIBRARIES(simple ${Boost_LIBRARIES})
 ADD_TEST(simple ${RUNTIME_OUTPUT_DIRECTORY}/simple)
 
 ROBOPTIM_CORE_PLUGIN_CMINPACK_TEST(plugin)
