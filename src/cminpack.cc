@@ -56,7 +56,9 @@ extern "C" {
     vector_to_array (fvec, solver->value());
     if (iflag < 2) return 0;
     // Get cost jacobian and convert to array
-    vector_to_array (fjrow, solver->jacobianRow (iflag - 2));
+    ::roboptim::Function::size_type row =
+	static_cast< ::roboptim::Function::size_type> (iflag) - 2;
+    vector_to_array (fjrow, solver->jacobianRow (row));
     return 0;
   }
 }
@@ -81,12 +83,16 @@ namespace roboptim
       jacobianRow_ (n_),
       cost_ (problem.function ().baseFunction ())
     {
+      std::size_t n = static_cast<std::size_t> (n_);
+      std::size_t m = static_cast<std::size_t> (m_);
+      std::size_t lwa = static_cast<std::size_t> (lwa_);
+
       // Initialize memory
-      memset (x_, 0, n_ * sizeof(double));
-      memset (fvec_, 0, m_ * sizeof(double));
-      memset (fjac_, 0, n_*n_ * sizeof(double));
-      memset (ipvt_, 0, n_ * sizeof(int));
-      memset (wa_, 0, lwa_ * sizeof(double));
+      memset (x_, 0, n * sizeof (double));
+      memset (fvec_, 0, m * sizeof (double));
+      memset (fjac_, 0, n * n * sizeof (double));
+      memset (ipvt_, 0, n * sizeof (int));
+      memset (wa_, 0, lwa * sizeof (double));
 
       // Initialize this class parameters
       parameter_.setZero ();
@@ -186,7 +192,10 @@ namespace roboptim
     {
       if (src.cols () == 0)
 	return;
-      memcpy (dst, &src(iRow,0), src.cols () * sizeof (Function::value_type));
+
+      std::size_t size =
+	static_cast<std::size_t> (src.cols ()) * sizeof (Function::value_type);
+      memcpy (dst, &src(iRow,0), size);
 
       // NaN != NaN, handle this case.
       for (Eigen::VectorXd::Index j = 0; j < src.cols (); ++j)

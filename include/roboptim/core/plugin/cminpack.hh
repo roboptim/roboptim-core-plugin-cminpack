@@ -84,9 +84,9 @@ namespace roboptim {
       }
 
       /// Get Jacobian
-      const gradient_t& jacobianRow (size_t iRow) const
+      const gradient_t& jacobianRow (size_type iRow) const
       {
-	(*cost_).gradient(jacobianRow_, parameter_, iRow);
+	(*cost_).gradient (jacobianRow_, parameter_, iRow);
 	return jacobianRow_;
       }
 
@@ -107,7 +107,7 @@ namespace roboptim {
       int lwa_;
       /// array of double of size lwa_;
       double* wa_;
-      
+
       /// Parameter of the function
       Function::argument_t parameter_;
       /// Value of the function
