@@ -1,30 +1,34 @@
 language: cpp
 compiler:
-  - clang
-  - gcc
-script: "./.travis.build.sh"
-before_install:
-  - git submodule update --init --recursive
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq doxygen doxygen-latex libltdl-dev libboost-all-dev liblog4cxx10-dev libeigen3-dev libcminpack-dev
-  - sudo pip install cpp-coveralls --use-mirrors
-after_success:
-  - coveralls -e _travis/install -e _travis/build/eigen-eigen-ffa86ffb5570/ -e _travis/build/roboptim-core -e tests
-  - git config --global user.name "Travis CI"
-  - git config --global user.email "thomas.moulard+travis@gmail.com"
-  - git remote set-url origin https://thomas-moulard:${GH_TOKEN}@github.com/roboptim/roboptim-core.git
-  - git fetch origin gh-pages:gh-pages
-  - cd _travis/build/doc && ../../../cmake/github/update-doxygen-doc.sh
-after_failure: "cat `pwd`/_travis/build/tests/*.log"
-notifications:
-  email:
-    - roboptim@googlegroups.com
-branches:
-  only:
-    - master
-matrix:
-  allow_failures:
-    - compiler: clang
+- gcc
+- clang
 env:
   global:
-    secure: "Slm+HqRT+Vy0SG7E9gEShuHvNz6XWRUmBhVBLVJEaYy/0Lo2qp4OjFEWDjiJwFIiXstW2Wclds4SuewAn3Tc4x7dsY+5uaMCX7S/HPzsBCjLXUwjKasUqEGaVTIYmtFJm57hOkz6K2SLUUV4intkMiwtCiq/R0xe92QTTKkHyfo="
+  - APT_DEPENDENCIES="doxygen doxygen-latex libltdl-dev libboost-all-dev liblog4cxx10-dev libeigen3-dev coinor-libipopt-dev libcminpack-dev"
+  - GIT_DEPENDENCIES="roboptim/roboptim-core"
+  - DEBSIGN_KEYID=5AE5CD75
+  - PPA_URI="roboptim/ppa"
+  - NSIQCPPSTYLE_FILEFILTERPATH=cmake/filefilter.txt
+  - GH_USERNAME=thomas-moulard
+  - GH_REPO=roboptim/roboptim-core-plugin-cminpack
+  - secure: YurfcUtraOayjgYuay0IDyY2FssU53q91VzeYXzAd1VdxH9IAatXXwQpBj8i/dSPM/1NtpB3gISpBktOy+KN7to7gKWeOQHWQOPae0SbuTPfOE5uyl1zWTtOypA3CI51el1+kmYN39Qi4ASt9LN5CD1ZZrsso7aH2bS/6YLWchA=
+  - secure: LRvqill/xVFcjMoco3qp0XrfGOi6U+syq1XbT7OTwZfHtIJii63McrmlqWP9d7vrxzwsi+F5i5fvpjLy6Idp7aX4myGiRXp7yZJC/rNVDVNbgosv4NNXE511S1C9ObGSksuTbF8oYa4qA8sMB1ZJW1A2cqeODBHYBr7rrEIIZ+U=
+  - secure: XFVC3kdigudQBqS56o8aUGRimJZe4fYz8pNzwBjkqyLp7GFshzcWJqitR8lS+/pbg7PmrVsyEivFvSY9j0bd4XEvZQY+WOfJHfS6X9G0IEoXmKw52muNIt/AwRXeeD8dX5FqPbtO65vKP+zgItSrlCiWpTpTF0uDjRGW3SYyaZA=
+notifications:
+  hipchat:
+    rooms:
+      secure: LJbgx2sjAmTUu+AV8N/PSQHFQ8E1OnHAB2oYFv1XwN2hujtswNwE9k16etaEBRZ0IP1z7mTWrabaztDPC5efEaGpi4TZLMr5P9n/ABWRvJi+tVMXG7fusxTNzOaqcr31g2VQBXJ2nMZWxawP4xzTp+sSVcVsHm5xt4UjLyVQ6+A=
+  email: roboptim@googlegroups.com
+before_install:
+- ./.travis/dependencies/eigen-3.2.0
+- ./.travis/run  before_install
+script: ./.travis/run build
+after_success: ./.travis/run after_success
+after_failure: ./.travis/run after_failure
+branches:
+  only:
+  - master
+  - debian
+matrix:
+  allow_failures:
+  - compiler: clang
