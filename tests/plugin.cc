@@ -37,6 +37,9 @@ typedef Solver <SumOfC1Squares, boost::mpl::vector <> > solver_t;
 
 BOOST_AUTO_TEST_CASE (plugin)
 {
+  lt_dlinit();
+  BOOST_REQUIRE_EQUAL (lt_dlsetsearchpath (PLUGIN_PATH), 0);
+
   boost::shared_ptr<boost::test_tools::output_test_stream>
     output = retrievePattern ("plugin");
 
@@ -73,4 +76,7 @@ BOOST_AUTO_TEST_CASE (plugin)
 
   std::cout << output->str () << std::endl;
   BOOST_CHECK (output->match_pattern ());
+
+  if (lt_dlexit ())
+    std::cerr << "lt_dlexit failed" << std::endl;
 }
