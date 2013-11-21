@@ -42,8 +42,8 @@ using roboptim::cminpack::matrix_to_array;
 
 extern "C" {
   int  roboptim_plugin_cminpack_fcn
-  (void *p, int m, int n, const double *x, double *fvec, double *fjrow,
-   int iflag)
+  (void *p, int ROBOPTIM_DEBUG_ONLY(m), int ROBOPTIM_DEBUG_ONLY(n),
+   const double *x, double *fvec, double *fjrow, int iflag)
   {
     // Get instance of solver.
     roboptim::cminpack::SolverWithJacobian* solver =
