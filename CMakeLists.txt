@@ -26,22 +26,23 @@ INCLUDE(cmake/cpack.cmake)
 
 SET(PROJECT_NAME roboptim-core-plugin-cminpack)
 SET(PROJECT_DESCRIPTION
-  "Non linear least-square optimization using Levenberg Marquardt algorithm."
+  "Nonlinear least-square optimization using Levenberg Marquardt algorithm."
   )
-SET(PROJECT_URL "")
-SET(CUSTOM_HEADER_DIR "roboptim/core/plugin")
+SET(PROJECT_URL "http://github.com/roboptim/roboptim-core-plugin-cminpack")
 
 # Where to compile shared objects
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
+SET(PKG_CONFIG_ADDITIONAL_VARIABLES plugindir ${PKG_CONFIG_ADDITIONAL_VARIABLES})
 SETUP_PROJECT()
 
 # Declare headers
 SET(${PROJECT_NAME}_HEADERS
   include/roboptim/core/plugin/cminpack.hh
-  )
+)
 
 # Search for dependencies.
+SET(BOOST_COMPONENTS date_time filesystem system unit_test_framework)
 SEARCH_FOR_BOOST()
 
 ADD_REQUIRED_DEPENDENCY("cminpack >= 1.0")

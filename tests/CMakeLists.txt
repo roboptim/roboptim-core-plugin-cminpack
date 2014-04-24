@@ -17,67 +17,17 @@
 # roboptim-core-plugin-cminpack  If not, see
 # <http://www.gnu.org/licenses/>.
 
-CONFIG_FILES(shared-tests/local-libdir.hh)
 
-# Make sure local headers are found
-INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/tests)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/tests)
+# Prepare test suite
+SET(PLUGIN_PATH "${CMAKE_BINARY_DIR}/src")
+INCLUDE(shared-tests/tests.cmake)
 
-# Add Boost path to include directories.
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+# RobOptim test problems
+SET(SOLVER_NAME "cminpack")
+SET(FUNCTION_TYPE ::roboptim::EigenMatrixDense)
+SET(PROGRAM_SUFFIX "")
+SET(COST_FUNCTION_TYPE ::roboptim::GenericDifferentiableFunction)
+SET(CONSTRAINT_TYPE_1 False)
+SET(CONSTRAINT_TYPE_2 False)
+BUILD_ROBOPTIM_PROBLEMS()
 
-# Make Boost.Test generates the main function in test cases.
-ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
-
-# To locate built plug-in.
-ADD_DEFINITIONS(-DPLUGIN_PATH="${LIBRARY_OUTPUT_PATH}")
-
-SET(COMMON_HEADERS
-  ${HEADERS}
-  shared-tests/common.hh
-  shared-tests/distance-to-sphere.hh
-  )
-
-# ROBOPTIM_CORE_CMINPACK_PLUGIN_TEST(NAME)
-# ----------------------------------------
-#
-# Define a test named `NAME'.
-#
-# This macro will create a binary from `NAME.cc', link it against
-# Boost and add it to the test suite.
-#
-MACRO(ROBOPTIM_CORE_PLUGIN_CMINPACK_TEST NAME)
-  ADD_EXECUTABLE(${NAME}
-    ${NAME}.cc
-    ${COMMON_HEADERS})
-  ADD_TEST(${NAME} ${RUNTIME_OUTPUT_DIRECTORY}/${NAME})
-
-  PKG_CONFIG_USE_DEPENDENCY(${NAME} roboptim-core)
-  PKG_CONFIG_USE_DEPENDENCY(${NAME} cminpack)
-
-  # Link against Boost.
-  TARGET_LINK_LIBRARIES(${NAME} ${Boost_LIBRARIES})
-
-  # Make sure the plugins will be found.
-  SET_PROPERTY(
-    TEST ${NAME} PROPERTY ENVIRONMENT
-    "LTDL_LIBRARY_PATH=${CMAKE_BINARY_DIR}/src:$ENV{LTDL_LIBRARY_PATH}")
-  SET_PROPERTY(
-    TEST ${NAME} PROPERTY ENVIRONMENT
-    "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/src:$ENV{LD_LIBRARY_PATH}")
-ENDMACRO(ROBOPTIM_CORE_PLUGIN_CMINPACK_TEST)
-
-
-# simple
-# Link the dummy solver with this test to bypass the plug-in system.
-ADD_EXECUTABLE(simple
-  simple.cc
-  ${COMMON_HEADERS}
-  ${CMAKE_SOURCE_DIR}/src/cminpack.cc
-  )
-PKG_CONFIG_USE_DEPENDENCY(simple roboptim-core)
-PKG_CONFIG_USE_DEPENDENCY(simple cminpack)
-TARGET_LINK_LIBRARIES(simple ${Boost_LIBRARIES})
-ADD_TEST(simple ${RUNTIME_OUTPUT_DIRECTORY}/simple)
-
-ROBOPTIM_CORE_PLUGIN_CMINPACK_TEST(plugin)
