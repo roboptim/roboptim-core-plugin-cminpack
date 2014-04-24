@@ -27,6 +27,7 @@ script:
   - . .travis/common.sh
   - export LD_LIBRARY_PATH="$install_dir/lib/`dpkg-architecture -qDEB_BUILD_MULTIARCH`/roboptim-core:$LD_LIBRARY_PATH"
   - ./.travis/run build
+after_success: ./.travis/run after_success
 after_failure: ./.travis/run after_failure
 branches:
   only:
