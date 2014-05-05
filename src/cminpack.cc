@@ -100,7 +100,7 @@ namespace roboptim
       jacobianRow_.setZero ();
     }
 
-    SolverWithJacobian::~SolverWithJacobian () throw ()
+    SolverWithJacobian::~SolverWithJacobian ()
     {
       delete[] x_;
       delete[] fvec_;
@@ -109,7 +109,7 @@ namespace roboptim
       delete[] wa_;
     }
 
-    void SolverWithJacobian::solve () throw ()
+    void SolverWithJacobian::solve ()
     {
       int ldfjac = static_cast<int> (n_);
       double tol = 1e-6;

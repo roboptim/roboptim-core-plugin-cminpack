@@ -49,9 +49,9 @@ namespace roboptim {
 
       /// \brief Constructot by problem
       explicit SolverWithJacobian (const problem_t& problem);
-      virtual ~SolverWithJacobian () throw ();
+      virtual ~SolverWithJacobian ();
       /// \brief Solve the optimization problem
-      virtual void solve () throw ();
+      virtual void solve ();
 
       /// Number of variables
       size_type n () const
