@@ -26,19 +26,8 @@
 #include "roboptim/core/solver-error.hh"
 #include "roboptim/core/plugin/cminpack.hh"
 
-
-namespace roboptim {
-  namespace cminpack {
-    // Copy row iRow of matrix to array of double
-    void
-    matrix_to_array (Function::value_type* dst, const Function::matrix_t& src,
-		     int iRow);
-  } // namespace cminpack
-} // end of namespace roboptim
-
 using roboptim::detail::array_to_vector;
 using roboptim::detail::vector_to_array;
-using roboptim::cminpack::matrix_to_array;
 
 extern "C" {
   int  roboptim_plugin_cminpack_fcn
@@ -186,24 +175,6 @@ namespace roboptim
       }
     }
 
-    void
-    matrix_to_array (Function::value_type* dst, const Function::matrix_t& src,
-		     int iRow)
-    {
-      if (src.cols () == 0)
-	return;
-
-      std::size_t size =
-	static_cast<std::size_t> (src.cols ()) * sizeof (Function::value_type);
-      memcpy (dst, &src(iRow,0), size);
-
-      // NaN != NaN, handle this case.
-      for (Eigen::VectorXd::Index j = 0; j < src.cols (); ++j)
-	if (src(iRow,j) != src(iRow,j))
-	  assert (dst[j] != dst[j]);
-	else
-	  assert (dst[j] == src(iRow,j));
-    }
   } // namespace cminpack
 } // end of namespace roboptim
 
