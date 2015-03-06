@@ -36,16 +36,25 @@ namespace roboptim {
     {
     public:
       /// \brief Parent type
-      typedef Solver<SumOfC1Squares, boost::mpl::vector<> >
-      parent_t;
+      typedef Solver<SumOfC1Squares, boost::mpl::vector<> > parent_t;
+
       /// \brief Cost function type
       typedef problem_t::function_t function_t;
-      /// \brief type of result
-      typedef parent_t::result_t result_t;
-      /// \brief type of gradient
-      typedef DifferentiableFunction::gradient_t gradient_t;
+
+      /// \brief Type of result
+      typedef function_t::argument_t argument_t;
+      typedef function_t::argument_ref argument_ref;
+      typedef function_t::const_argument_ref const_argument_ref;
+
+      /// \brief Type of result
+      typedef function_t::result_t result_t;
+
+      /// \brief Type of gradient
+      typedef function_t::gradient_t gradient_t;
+      typedef function_t::const_gradient_ref const_gradient_ref;
+
       /// \brief Size type
-      typedef Function::size_type size_type;
+      typedef function_t::size_type size_type;
 
       /// \brief Constructot by problem
       explicit SolverWithJacobian (const problem_t& problem);
@@ -66,25 +75,25 @@ namespace roboptim {
       }
 
       /// Get parameter
-      Function::argument_t& parameter ()
+      argument_ref parameter ()
       {
 	return parameter_;
       }
 
-      const Function::argument_t& parameter () const
+      const_argument_ref parameter () const
       {
 	return parameter_;
       }
 
       /// Get value
-      const Function::argument_t& value () const
+      const_argument_ref value () const
       {
 	(*cost_)(value_, parameter_);
 	return value_;
       }
 
       /// Get Jacobian
-      const gradient_t& jacobianRow (size_type iRow) const
+      const_gradient_ref jacobianRow (size_type iRow) const
       {
 	(*cost_).gradient (jacobianRow_, parameter_, iRow);
 	return jacobianRow_;
@@ -109,9 +118,9 @@ namespace roboptim {
       double* wa_;
 
       /// Parameter of the function
-      Function::argument_t parameter_;
+      argument_t parameter_;
       /// Value of the function
-      mutable Function::argument_t value_;
+      mutable argument_t value_;
       /// Jacobian of the cost function
       mutable gradient_t jacobianRow_;
       /// Reference to cost function
