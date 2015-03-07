@@ -75,25 +75,25 @@ namespace roboptim {
       }
 
       /// Get parameter
-      argument_ref parameter ()
+      argument_t& parameter ()
       {
 	return parameter_;
       }
 
-      const_argument_ref parameter () const
+      const argument_t& parameter () const
       {
 	return parameter_;
       }
 
       /// Get value
-      const_argument_ref value () const
+      const argument_t& value () const
       {
 	(*cost_)(value_, parameter_);
 	return value_;
       }
 
       /// Get Jacobian
-      const_gradient_ref jacobianRow (size_type iRow) const
+      const gradient_t& jacobianRow (size_type iRow) const
       {
 	(*cost_).gradient (jacobianRow_, parameter_, iRow);
 	return jacobianRow_;
