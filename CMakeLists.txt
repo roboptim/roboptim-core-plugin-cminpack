@@ -30,6 +30,9 @@ SET(PROJECT_DESCRIPTION
   )
 SET(PROJECT_URL "http://github.com/roboptim/roboptim-core-plugin-cminpack")
 
+# Use MathJax for Doxygen formulae
+SET(DOXYGEN_USE_MATHJAX "YES")
+
 # Where to compile shared objects
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
