@@ -19,7 +19,6 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-#SET(CXX_DISABLE_WERROR TRUE)
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/boost.cmake)
 INCLUDE(cmake/cpack.cmake)
@@ -32,9 +31,6 @@ SET(PROJECT_URL "http://github.com/roboptim/roboptim-core-plugin-cminpack")
 
 # Use MathJax for Doxygen formulae
 SET(DOXYGEN_USE_MATHJAX "YES")
-
-# Where to compile shared objects
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 SET(PKG_CONFIG_ADDITIONAL_VARIABLES plugindir ${PKG_CONFIG_ADDITIONAL_VARIABLES})
 SETUP_PROJECT()
