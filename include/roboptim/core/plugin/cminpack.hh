@@ -32,14 +32,14 @@ namespace roboptim {
     /// This solver tries to minimize the euclidean norm of a vector valued
     /// function.
     class SolverWithJacobian :
-      public Solver<SumOfC1Squares, boost::mpl::vector<> >
+      public Solver<EigenMatrixDense>
     {
     public:
       /// \brief Parent type
-      typedef Solver<SumOfC1Squares, boost::mpl::vector<> > parent_t;
+      typedef Solver<EigenMatrixDense> parent_t;
 
       /// \brief Cost function type
-      typedef problem_t::function_t function_t;
+      typedef SumOfC1Squares function_t;
 
       /// \brief Type of result
       typedef function_t::argument_t argument_t;
@@ -88,15 +88,20 @@ namespace roboptim {
       /// Get value
       const argument_t& value () const
       {
-	(*cost_)(value_, parameter_);
+	(*baseCost_)(value_, parameter_);
 	return value_;
       }
 
       /// Get Jacobian
       const gradient_t& jacobianRow (size_type iRow) const
       {
-	(*cost_).gradient (jacobianRow_, parameter_, iRow);
+	(*baseCost_).gradient (jacobianRow_, parameter_, iRow);
 	return jacobianRow_;
+      }
+
+      const boost::shared_ptr<const DifferentiableFunction> baseCost () const
+      {
+        return baseCost_;
       }
 
     private:
@@ -105,17 +110,17 @@ namespace roboptim {
       /// Dimension of the cost function
       size_type m_;
       /// Array of double to store variable of optimization problem
-      double* x_;
+      vector_t x_;
       /// Array of double to store value of optimization problem
-      double* fvec_;
+      vector_t fvec_;
       /// Array of double to store one line of Jacobian
-      double* fjac_;
+      vector_t fjac_;
       /// Array of int used by the optimizer
-      int* ipvt_;
+      Eigen::VectorXi ipvt_;
       /// Positive integer not less than 5*n_+m_
       int lwa_;
       /// array of double of size lwa_;
-      double* wa_;
+      vector_t wa_;
 
       /// Parameter of the function
       argument_t parameter_;
@@ -124,7 +129,7 @@ namespace roboptim {
       /// Jacobian of the cost function
       mutable gradient_t jacobianRow_;
       /// Reference to cost function
-      boost::shared_ptr <const DifferentiableFunction> cost_;
+      boost::shared_ptr <const DifferentiableFunction> baseCost_;
     }; // class Solver
   } // namespace cminpack
 } // namespace roboptim

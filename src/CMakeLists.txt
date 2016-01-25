@@ -17,7 +17,6 @@
 # roboptim-core-plugin-cminpack  If not, see
 # <http://www.gnu.org/licenses/>.
 
-# Define the directory where plug-ins will be installed.
 SET(PLUGIN_NAME ${PROJECT_NAME})
 
 # Define the directory where plug-ins will be installed.

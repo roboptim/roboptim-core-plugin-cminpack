@@ -56,61 +56,76 @@ namespace roboptim
 {
   namespace cminpack
   {
-    SolverWithJacobian::SolverWithJacobian (const problem_t& problem) :
-      Solver <SumOfC1Squares, boost::mpl::vector<> >
-      (problem),
-      n_ (problem.function ().baseFunction ()->inputSize ()),
-      m_ (problem.function ().baseFunction ()->outputSize ()),
-      x_ (new double [n_]),
-      fvec_ (new double [m_]),
-      fjac_ (new double [n_*n_]),
-      ipvt_ (new int [n_]),
-      lwa_ (static_cast<int> (5 * n_ + m_)),
-      wa_ (new double [lwa_]),
-      parameter_ (n_),
-      value_ (m_),
-      jacobianRow_ (n_),
-      cost_ (problem.function ().baseFunction ())
+    SolverWithJacobian::SolverWithJacobian (const problem_t& pb) :
+      parent_t (pb),
+      n_ (),
+      m_ (),
+      x_ (),
+      fvec_ (),
+      fjac_ (),
+      ipvt_ (),
+      lwa_ (),
+      wa_ (),
+      parameter_ (),
+      value_ (),
+      jacobianRow_ (),
+      baseCost_ ()
     {
-      std::size_t n = static_cast<std::size_t> (n_);
-      std::size_t m = static_cast<std::size_t> (m_);
-      std::size_t lwa = static_cast<std::size_t> (lwa_);
+      const SumOfC1Squares* cost
+        = dynamic_cast<const SumOfC1Squares*> (&pb.function ());
+
+      if (!cost)
+      {
+        throw std::runtime_error ("the cminpack plugin expects"
+                                  " a SumOfC1Squares cost function");
+      }
+
+      baseCost_ = cost->baseFunction ();
+
+      n_ = baseCost_->inputSize ();
+      m_ = baseCost_->outputSize ();
+      lwa_ = static_cast<int> (5 * n_ + m_);
 
       // Initialize memory
-      memset (x_, 0, n * sizeof (double));
-      memset (fvec_, 0, m * sizeof (double));
-      memset (fjac_, 0, n * n * sizeof (double));
-      memset (ipvt_, 0, n * sizeof (int));
-      memset (wa_, 0, lwa * sizeof (double));
+      x_.resize (n_);
+      x_.setZero ();
+      fvec_.resize (m_);
+      fvec_.setZero ();
+      fjac_.resize (n_*n_);
+      fjac_.setZero ();
+      ipvt_.resize (n_);
+      ipvt_.setZero ();
+      wa_.resize (lwa_);
+      wa_.setZero ();
 
       // Initialize this class parameters
+      parameter_.resize (n_);
       parameter_.setZero ();
+      value_.resize (m_);
       value_.setZero ();
+      jacobianRow_.resize (n_);
       jacobianRow_.setZero ();
     }
 
     SolverWithJacobian::~SolverWithJacobian ()
     {
-      delete[] x_;
-      delete[] fvec_;
-      delete[] fjac_;
-      delete[] ipvt_;
-      delete[] wa_;
     }
 
     void SolverWithJacobian::solve ()
     {
       int ldfjac = static_cast<int> (n_);
       double tol = 1e-6;
+
       // Set initial guess
       if (problem().startingPoint()) {
-	vector_to_array (x_, *(problem().startingPoint()));
+        x_ = *(problem().startingPoint());
       }
+
       int info = lmstr1(roboptim_plugin_cminpack_fcn,
 			(void*)this,
 			static_cast<int> (m_), static_cast<int> (n_),
-			x_, fvec_, fjac_, ldfjac,
-			tol, ipvt_, wa_, lwa_);
+			x_.data(), fvec_.data(), fjac_.data(), ldfjac,
+			tol, ipvt_.data(), wa_.data(), lwa_);
       switch (info) {
       case 0:
 	result_ = SolverError ("improper input parameters");
@@ -120,7 +135,7 @@ namespace roboptim
       case 3:
 	{
 	  Result result (n_, 1);
-	  array_to_vector(result.x, x_);
+	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result_ = result;
 	}
@@ -128,7 +143,7 @@ namespace roboptim
       case 4:
 	{
 	  ResultWithWarnings result (n_, 1);
-	  array_to_vector(result.x, x_);
+	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
 				    ("fvec is orthogonal to the columns of"
@@ -139,7 +154,7 @@ namespace roboptim
       case 5:
 	{
 	  ResultWithWarnings result (n_, 1);
-	  array_to_vector(result.x, x_);
+	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
 				    ("number of calls to fcn with iflag = 1 "
@@ -150,7 +165,7 @@ namespace roboptim
       case 6:
 	{
 	  ResultWithWarnings result (n_, 1);
-	  array_to_vector(result.x, x_);
+	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
 				    ("tol is too small. no further reduction"
@@ -161,7 +176,7 @@ namespace roboptim
       case 7:
 	{
 	  ResultWithWarnings result (n_, 1);
-	  array_to_vector(result.x, x_);
+	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
 				    ("tol is too small. no further"
