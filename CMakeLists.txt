@@ -24,13 +24,9 @@ INCLUDE(cmake/boost.cmake)
 INCLUDE(cmake/cpack.cmake)
 
 SET(PROJECT_NAME roboptim-core-plugin-cminpack)
-SET(PROJECT_DESCRIPTION
-  "Nonlinear least-square optimization using Levenberg Marquardt algorithm."
-  )
+SET(PROJECT_DESCRIPTION "Nonlinear least-square optimization using Levenberg Marquardt algorithm.")
 SET(PROJECT_URL "http://github.com/roboptim/roboptim-core-plugin-cminpack")
-
-# Use MathJax for Doxygen formulae
-SET(DOXYGEN_USE_MATHJAX "YES")
+SET(PROJECT_DEBUG_POSTFIX "_d")
 
 SET(PKG_CONFIG_ADDITIONAL_VARIABLES plugindir ${PKG_CONFIG_ADDITIONAL_VARIABLES})
 SETUP_PROJECT()
@@ -52,5 +48,7 @@ PKG_CONFIG_APPEND_LIBS("roboptim-core-plugin-cminpack")
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests)
+
+HEADER_INSTALL("${HEADERS}")
 
 SETUP_PROJECT_FINALIZE()
