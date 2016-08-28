@@ -25,6 +25,7 @@
 #include "roboptim/core/problem.hh"
 #include "roboptim/core/solver-error.hh"
 #include "roboptim/core/plugin/cminpack.hh"
+#include "roboptim/core/plugin/cminpack/config.hh"
 
 using roboptim::detail::array_to_vector;
 using roboptim::detail::vector_to_array;
@@ -142,7 +143,7 @@ namespace roboptim
 	break;
       case 4:
 	{
-	  ResultWithWarnings result (n_, 1);
+	  Result result (n_, 1);
 	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
@@ -153,7 +154,7 @@ namespace roboptim
 	break;
       case 5:
 	{
-	  ResultWithWarnings result (n_, 1);
+	  Result result (n_, 1);
 	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
@@ -164,7 +165,7 @@ namespace roboptim
 	break;
       case 6:
 	{
-	  ResultWithWarnings result (n_, 1);
+	  Result result (n_, 1);
 	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
@@ -175,7 +176,7 @@ namespace roboptim
 	break;
       case 7:
 	{
-	  ResultWithWarnings result (n_, 1);
+	  Result result (n_, 1);
 	  result.x = x_;
 	  result.value = problem().function()(result.x);
 	  result.warnings.push_back(SolverWarning
@@ -198,27 +199,27 @@ extern "C"
   using namespace roboptim::cminpack;
   typedef SolverWithJacobian::parent_t solver_t;
 
-  ROBOPTIM_DLLEXPORT unsigned getSizeOfProblem ();
-  ROBOPTIM_DLLEXPORT const char* getTypeIdOfConstraintsList ();
-  ROBOPTIM_DLLEXPORT solver_t* create (const SolverWithJacobian::problem_t& pb);
-  ROBOPTIM_DLLEXPORT void destroy (solver_t* p);
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT unsigned getSizeOfProblem ();
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT const char* getTypeIdOfConstraintsList ();
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT solver_t* create (const SolverWithJacobian::problem_t& pb);
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT void destroy (solver_t* p);
 
-  ROBOPTIM_DLLEXPORT unsigned getSizeOfProblem ()
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT unsigned getSizeOfProblem ()
   {
     return sizeof (solver_t::problem_t);
   }
 
-  ROBOPTIM_DLLEXPORT const char* getTypeIdOfConstraintsList ()
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT const char* getTypeIdOfConstraintsList ()
   {
     return typeid (solver_t::problem_t::constraintsList_t).name ();
   }
 
-  ROBOPTIM_DLLEXPORT solver_t* create (const SolverWithJacobian::problem_t& pb)
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT solver_t* create (const SolverWithJacobian::problem_t& pb)
   {
     return new SolverWithJacobian (pb);
   }
 
-  ROBOPTIM_DLLEXPORT void destroy (solver_t* p)
+  ROBOPTIM_CORE_PLUGIN_CMINPACK_DLLEXPORT void destroy (solver_t* p)
   {
     delete p;
   }
